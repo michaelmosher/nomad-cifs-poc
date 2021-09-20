@@ -1,3 +1,6 @@
 # vagrant
 .vagrant
 **/*-cloudimg-console.log
+
+# ansible
+ansible/roles/galaxy-*
