@@ -1,0 +1,7 @@
+---
+
+- name: Start MDNS resolver
+  systemd:
+    name: avahi-daemon
+    state: started
+    enabled: yes
