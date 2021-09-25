@@ -1,0 +1,7 @@
+---
+
+# Community roles should be named "galaxy-*" so we can gitignore them.
+- src: https://github.com/ansible-community/ansible-nomad.git
+  name: galaxy-nomad
+  scm: git
+  version: v1.9.6

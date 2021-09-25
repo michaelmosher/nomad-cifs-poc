@@ -1,0 +1,10 @@
+---
+
+- name: Install MDNS packages
+  ansible.builtin.dnf:
+    name: nss-mdns
+  notify:
+    - Start MDNS resolver
+
+# don't wait until the end of the run to handle notifications
+- meta: flush_handlers

@@ -1,0 +1,11 @@
+---
+
+- hosts: all
+  roles:
+    - basics
+    - multicast_dns
+
+    - role: galaxy-nomad
+      vars:
+        nomad_version: "1.1.0"
+        nomad_bind_address: "0.0.0.0"

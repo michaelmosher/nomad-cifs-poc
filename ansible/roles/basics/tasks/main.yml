@@ -1,0 +1,8 @@
+---
+
+- name: install standard prerequisites
+  ansible.builtin.dnf:
+    name:
+      - epel-release
+      - unzip
+    update_cache: yes
