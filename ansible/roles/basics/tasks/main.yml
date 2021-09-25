@@ -6,3 +6,11 @@
       - epel-release
       - unzip
     update_cache: yes
+
+- name: allow more aggressive system time corrections
+  ansible.builtin.lineinfile:
+    path: /etc/chrony.conf
+    regexp: ^makestep [0-9\.]+ (-)?[0-9]+$
+    line: makestep 1 -1
+  notify:
+    - Restart Chrony service
