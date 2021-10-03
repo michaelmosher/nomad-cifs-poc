@@ -1,7 +1,11 @@
 ---
 
-- name: Start MDNS resolver
+- name: Restart DNS resolver
   systemd:
-    name: avahi-daemon
-    state: started
-    enabled: yes
+    name: systemd-resolved
+    state: restarted
+
+- name: Restart Network service
+  systemd:
+    name: NetworkManager
+    state: restarted

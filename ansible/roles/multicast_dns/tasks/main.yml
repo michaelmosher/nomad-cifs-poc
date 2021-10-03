@@ -1,10 +1,37 @@
 ---
 
-- name: Install MDNS packages
-  ansible.builtin.dnf:
-    name: nss-mdns
+# The system DNS resolver knows how to handle multicast DNS. We simply need to
+# enable the functionality, and then make sure all network tools are configured
+# to rely on it instead of other means.
+- name: Enable multicast on DNS resolver
+  community.general.ini_file:
+    path: /etc/systemd/resolved.conf
+    section: Resolve
+    option: MulticastDNS
+    value: 'yes'
   notify:
-    - Start MDNS resolver
+    - Restart DNS resolver
+
+# Ensure tools that rely on /etc/resolv.conf are configured to use systemd-resolved.
+# Also enable MDNS for each network interface (confirm with resolvectl).
+- name: Enable multicast on Network devices
+  community.general.ini_file:
+    path: /etc/NetworkManager/conf.d/mdns.conf
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+  loop:
+    - {section: "main", option: "dns", value: "systemd-resolved"}
+    - {section: "connection", option: "connection.mdns", value: "2"}
+  notify:
+    - Restart Network service
+
+# Ensure tools that rely on /etc/nsswitch.conf are configured to use systemd-resolved.
+- name: Configure NSS to do MDNS lookups
+  ansible.builtin.lineinfile:
+    path: /etc/nsswitch.conf
+    regexp: "^hosts: .*$"
+    line: "hosts:      files resolve dns myhostname"
 
 # don't wait until the end of the run to handle notifications
 - meta: flush_handlers
