@@ -1,6 +1,6 @@
 #!/usr/local/bin/nomad job run
 
-job "file_sharing" {
+job "nfs" {
   datacenters = ["vagrant"]
   type = "service"
 
@@ -13,6 +13,10 @@ job "file_sharing" {
       port "active_directory" {
         static = 445
       }
+    }
+
+    service {
+      port = "active_directory"
     }
 
     ephemeral_disk {
@@ -34,9 +38,15 @@ job "file_sharing" {
         }
       }
 
-      env {
-        USER = "sharing;insecure"
-        SHARE = "public;/share/public"
+      template {
+        data = <<EOF
+          {{ with $d := key "poc/cifs/config" | parseJSON }}
+          USER={{ $d.username }};{{ $d.password | toJSON }}
+          SHARE={{ $d.share }};/share/public{{end}}
+        EOF
+
+        destination = "secrets/file.env"
+        env = true
       }
 
       template {
