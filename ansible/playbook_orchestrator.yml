@@ -5,7 +5,14 @@
     - basics
     - multicast_dns
 
+    - role: galaxy-consul
+      vars:
+        consul_version: "1.9.4"
+        consul_bootstrap_expect: yes
+        consul_client_address: "0.0.0.0"
+
     - role: galaxy-nomad
       vars:
         nomad_version: "1.1.0"
         nomad_bind_address: "0.0.0.0"
+        nomad_use_consul: yes

@@ -1,0 +1,4 @@
+---
+
+consul_retry_join_skip_hosts: yes
+consul_raw_key: st/iGMWbEs5WJ0EacrMzSIdp28/rT/AuWShI1FE7+Ww=

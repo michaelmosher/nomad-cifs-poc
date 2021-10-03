@@ -1,0 +1,13 @@
+---
+
+- name: Configure systemd-resolved to direct consul URLs to consul
+  ini_file:
+    path: /etc/systemd/resolved.conf
+    section: Resolve
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+  loop:
+    - { option: "DNS", value: "{{ consul_dns_handler }}"}
+    - { option: "Domains", value: "~consul"}
+  notify:
+    - Restart DNS resolver

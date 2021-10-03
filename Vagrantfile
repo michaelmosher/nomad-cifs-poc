@@ -5,7 +5,7 @@ machines = {
     :orchestrator => {
         :count => 1,
         :memory => 512,
-        :port_forward => [4646],
+        :port_forward => [4646, 8500],
     },
     :worker => {
         :count => 2,
@@ -13,13 +13,14 @@ machines = {
     }
 }
 
-nomad_instances = machines.flat_map do |name, cfg|
+instances = machines.flat_map do |name, cfg|
     (1..cfg[:count]).map { |id| "vg-#{name}-#{'%02d' % id}" }
 end
 
-nomad_orchestrators = nomad_instances.filter { |item| item.include?("orchestrator") }
+orchestrators = instances.filter { |item| item.include?("orchestrator") }
 
 Vagrant.configure("2") do |config|
+    # config.vm.box = "fedora-coreos-stable/34.20210904.3.0"
     config.vm.box = "centos/stream8"
     config.vm.box_version = "20210210.0"
 
@@ -47,16 +48,24 @@ Vagrant.configure("2") do |config|
                     ansible.galaxy_roles_path = "ansible/roles"
                     ansible.playbook = "ansible/playbook_#{name}.yml"
 
-                    ansible.host_vars = nomad_orchestrators.each_with_object({}) do |host, host_vars|
+                    ansible.host_vars = orchestrators.each_with_object({}) do |host, host_vars|
                         host_vars[host] = {
+                            "consul_node_role" => "server",
                             "nomad_node_role" => "server",
-                            "nomad_advertise_address" => "#{host}.local",
                         }
                     end
 
                     ansible.groups = {
-                        "nomad_instances" => nomad_instances,
+                        "consul_instances" => instances,
+                        "nomad_instances" => instances,
+
                         "all:vars" => {
+                            consul_datacenter: "vagrant",
+                            consul_iface: "eth1",
+                            consul_bootstrap_expect_value: orchestrators.length,
+                            consul_join: orchestrators.map { |h| "#{h}.local"},
+
+                            nomad_bootstrap_expect: orchestrators.length,
                             nomad_datacenter: "vagrant",
                             nomad_iface: "eth1",
                             nomad_network_interface: "eth1",

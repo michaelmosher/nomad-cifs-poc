@@ -5,9 +5,32 @@
   roles:
     - basics
     - multicast_dns
-    - docker
+
+    - role: galaxy-consul
+      vars:
+        consul_version: "1.9.4"
+        consul_client_address: "0.0.0.0"
+        consul_addresses_dns: "{{ consul_bind_address }}"
+        consul_ports_dns: 53
+
+    - role: consul_dns
+      vars:
+        consul_dns_handler: "{{ consul_bind_address }}"
+
+    - role: docker
+      vars:
+        docker_dns_hosts:
+          - "{{ consul_bind_address }}"
+          - "8.8.8.8"
+          - "8.8.4.4"
 
     - role: galaxy-nomad
       vars:
         nomad_version: "1.1.0"
         nomad_bind_address: "0.0.0.0"
+        nomad_use_consul: yes
+        nomad_plugins:
+          docker:
+            config:
+              volumes:
+                enabled: yes

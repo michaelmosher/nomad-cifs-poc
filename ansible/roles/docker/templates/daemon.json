@@ -1,0 +1,4 @@
+{
+    "dns": {{ docker_dns_hosts | to_json }},
+    "log-driver": "local"
+}

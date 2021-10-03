@@ -3,8 +3,8 @@
 - name: install standard prerequisites
   ansible.builtin.dnf:
     name:
-      - epel-release
       - unzip
+      - epel-release
     update_cache: yes
 
 - name: allow more aggressive system time corrections

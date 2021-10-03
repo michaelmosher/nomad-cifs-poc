@@ -1,0 +1,6 @@
+---
+
+- name: Restart DNS resolver
+  systemd:
+    name: systemd-resolved
+    state: restarted

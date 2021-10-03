@@ -15,6 +15,18 @@
       - containerd.io
     update_cache: yes
 
+- name: Create Docker config directory
+  ansible.builtin.file:
+    path: /etc/docker/
+    state: directory
+
+- name: Create Docker config file
+  ansible.builtin.template:
+    src: templates/daemon.json
+    dest: /etc/docker/daemon.json
+  notify:
+    - Restart docker service
+
 - name: Start docker service
   ansible.builtin.service:
     name: docker
